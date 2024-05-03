@@ -86,7 +86,7 @@ def clean_scada(scada_file: str | Path) -> pd.DataFrame:
     logger.info("Removing out of range of temperature readings")
     scada_df = scada_df[(scada_df["Ot_avg"] >= -15.0) & (scada_df["Ot_avg"] <= 45.0)]
 
-    # Filter out the unresponsive sensors
+    # Filter out the unresponsive sensors 
     # Due to data discretization, there appear to be a large number of repeating values
     logger.info("Flagging unresponsive sensors")
     turbine_id_list = scada_df.Wind_turbine_name.unique()
