@@ -163,14 +163,14 @@ def prepare(
     # METER DATA #
     ##############
     logger.info("Reading in the meter data")
-    meter_curtail_df = pd.read_csv(path / "seci1-windmeter-data-jan2023.csv")
+    meter_curtail_df = pd.read_csv(path / "cleaned_seci1-plantdata-3turbines.csv")
     meter_df = meter_curtail_df.copy()
 
     # Create datetime field
     meter_df["time"] = pd.to_datetime(meter_df.time_utc).dt.tz_localize(None)
 
     # Drop the fields we don't need
-    meter_df.drop(["time_utc", "availability_kwh", "curtailment_kwh"], axis=1, inplace=True)
+    meter_df.drop(["timestamp", "availability_kWh", "curtailment_kWh"], axis=1, inplace=True)
 
     #####################################
     # Availability and Curtailment Data #
@@ -182,7 +182,7 @@ def prepare(
     curtail_df["time"] = pd.to_datetime(curtail_df.time_utc).dt.tz_localize(None)
 
     # Drop the fields we don't need
-    curtail_df.drop(["time_utc"], axis=1, inplace=True)
+    curtail_df.drop(["timestamp"], axis=1, inplace=True)
 
     ###################
     # REANALYSIS DATA #

@@ -1,0 +1,56 @@
+{
+    "asset": {
+      "asset_id": "wtg",
+      "elevation": "elevation",
+      "hub_height": "hub_height",
+      "latitude": "latitude",
+      "longitude": "longitude",
+      "rated_power": "rated_power",
+      "rotor_diameter": "rotor_diameter"
+    },
+    "capacity": 249.9,
+    "curtail": {
+      "IAVL_DnWh": "availability_kWh",
+      "IAVL_ExtPwrDnWh": "curtailment_kWh",
+      "frequency": "10min",
+      "time": "time"
+    },
+    "latitude": 48.4497,
+    "longitude": 5.5896,
+    "meter": {
+      "MMTR_SupWh": "net_energy_kWh",
+      "time": "time"
+    },
+    "reanalysis": {
+      "era5": {
+        "WMETR_EnvPres": "surf_pres",
+        "WMETR_EnvTmp": "t_2m",
+        "WMETR_HorWdDir": "winddirection_deg",
+        "WMETR_HorWdSpdU": "u_100",
+        "WMETR_HorWdSpdV": "v_100",
+        "frequency": "h",
+        "time": "datetime"
+      },
+      "merra2": {
+        "WMETR_EnvPres": "surface_pressure",
+        "WMETR_EnvTmp": "temp_2m",
+        "WMETR_HorWdDir": "winddirection_deg",
+        "WMETR_HorWdSpdU": "u_50",
+        "WMETR_HorWdSpdV": "v_50",
+        "frequency": "h",
+        "time": "datetime"
+      }
+    },
+    "scada": {
+      "WMET_EnvTmp": "TempOutdoor_Avg",
+      "WMET_HorWdDir": "absolute_wind_direction_avg",
+      "WMET_HorWdDirRel": "WindDirection_Avg",
+      "WMET_HorWdSpd": "WindSpeedms_Avg",
+      "WROT_BlPthAngVal": "Pitchangle_avg",
+      "WTUR_W": "ActivePowerkW_avg",
+      "asset_id": "wtg",
+      "frequency": "10min",
+      "time": "Timestamp_ist"
+    }
+  }
+  

@@ -1,0 +1,46 @@
+asset:
+  elevation: elevation  # elevation abouve sea level, meters
+  hub_height: hub_height  # hub height, meters
+  asset_id: wtg
+  latitude: latitude  # SECI1 latitude
+  longitude: longitude  # SECI1 longitude
+  rated_power: rated_power  # rated power, MW
+  rotor_diameter: rotar_diameter  # rotor diameter, meters
+curtail:
+  IAVL_DnWh: availability_kWh  # availability, kWh
+  IAVL_ExtPwrDnWh: curtailment_kWh  # curtailment, kWh
+  frequency: 10min  # timestamp frequency
+  time: time  # timestamp
+latitude: 48.4497  
+longitude: 5.5896  
+capacity: 249.9  # Plant capacity, MW (all 119 turbines)
+meter:
+  MMTR_SupWh: net_energy_kWh  # net energy, kWh
+  time: time  # timestamp
+reanalysis:
+  era5:  # reanalysis product name/ID
+    frequency: h  # timestamp frequency
+    WMETR_EnvPres: surf_pres  # surface pressure, Pa
+    WMETR_EnvTmp: t_2m  # temperature, K
+    time: datetime  # timestamps
+    WMETR_HorWdSpdU: u_100  # u-direction windspeed, m/s
+    WMETR_HorWdSpdV: v_100  # v-direction windspeed, m/s
+    WMETR_HorWdDir: winddirection_deg  # wind direction, degrees
+  merra2:  # reanalysis product name/ID
+    frequency: h  # timestamp frequency
+    WMETR_EnvPres: surface_pressure  # surface pressure, Pa
+    WMETR_EnvTmp: temp_2m  # temperature, K
+    time: datetime  # timestamps
+    WMETR_HorWdSpdU: u_50  # u-direction windspeed, m/s
+    WMETR_HorWdSpdV: v_50  # v-direction windspeed, m/s
+    WMETR_HorWdDir: winddirection_deg  # wind direction, degrees
+scada:
+  frequency: 10min  # timestamp frequency
+  asset_id: wtg  # Unique ID of wind turbine
+  WROT_BlPthAngVal: Pitchangle_avg  # pitch angle, degrees
+  WTUR_W: ActivePowerkW_avg  # power produced, kW
+  WMET_EnvTmp: TempOutdoor_Avg  # temperature, C
+  time: Timestamp_ist  # timestamps
+  WMET_HorWdDir: absolute_wind_direction_avg  # wind direction, degrees
+  WMET_HorWdDirRel: WindDirection_Avg  # wind direction relative to nacelle orientation, degrees
+  WMET_HorWdSpd: WindSpeedms_Avg  # non-directional windspeed, m/s
