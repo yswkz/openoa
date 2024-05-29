@@ -1,3 +1,4 @@
+#%%
 from __future__ import annotations
 
 import re
@@ -12,6 +13,7 @@ import openoa.utils.met_data_processing as met
 from openoa.plant import PlantData
 from openoa.utils import filters, timeseries
 from openoa.logging import logging
+#%%
 
 
 logger = logging.getLogger()
@@ -25,7 +27,7 @@ def extract_data(path="data/SECI1_data"):
         logger.info("Extracting compressed data files")
         with ZipFile(path.with_suffix(".zip")) as zipfile:
             zipfile.extractall(path)
-
+#%%
 
 def clean_scada(seci1_file: str | Path) -> pd.DataFrame:
     """Reads in and cleans up the SCADA data
@@ -50,7 +52,7 @@ def clean_scada(seci1_file: str | Path) -> pd.DataFrame:
 
     # Remove extreme values from the temperature field
     logger.info("Removing out of range of temperature readings")
-    seci1_df = seci1_df[(seci1_df["TempOutdoor_avg"] >= -15.0) & (seci1_df["TempOutdoor_avg"] <= 45.0)]
+    seci1_df = seci1_df[(seci1_df["TempOutdoor_Avg"] >= -15.0) & (seci1_df["TempOutdoor_Avg"] <= 45.0)]
 
     # Filter out the unresponsive sensors
     # Due to data discretization, there appear to be a large number of repeating values
@@ -74,10 +76,10 @@ def clean_scada(seci1_file: str | Path) -> pd.DataFrame:
     seci1_df.loc[ix_gt_180, "PitchAngle_Avg"] = seci1_df.loc[ix_gt_180, "PitchAngle_Avg"] - 360.0
 
     logger.info("Calculating energy production")
-    seci1_df["energy_kwh"] = un.convert_power_to_energy(seci1_df.ActivePower_Avg * 1000, seci1_freq) / 1000
+    seci1_df["energy_kwh"] = un.convert_power_to_energy(seci1_df.ActivePowerkW_Avg * 1000, seci1_freq) / 1000
 
     return seci1_df
-
+#%%
 
 def load_cleansed_data(path: str | Path, return_value="plantdata") -> PlantData:
     """Loads the already created data in `path`/cleansed, if previously parsed.
@@ -99,7 +101,6 @@ def load_cleansed_data(path: str | Path, return_value="plantdata") -> PlantData:
     curtail_df = pd.read_csv(path / "curtail.csv")
     asset_df = pd.read_csv(path / "asset.csv")
     reanalysis = dict(
-        era5=pd.read_csv(path / "reanalysis_era5.csv"),
         merra2=pd.read_csv(path / "reanalysis_merra2.csv"),
     )
 
@@ -120,11 +121,11 @@ def load_cleansed_data(path: str | Path, return_value="plantdata") -> PlantData:
         return engie_plantdata
     else:
         raise ValueError("`return_value` must be one of 'plantdata' or 'dataframes'.")
-    
+#%%    
 
 
 def prepare(
-    path: str | Path = "data/SECI1_data", return_value="plantdata", use_cleansed: bool = False
+    path: str | Path = "data/SECI1_data/SECI1_data", return_value="plantdata", use_cleansed: bool = False
 ):
     """
     Do all loading and preparation of the data for this plant.
@@ -137,7 +138,6 @@ def prepare(
 
     if type(path) == str:
         path = Path(path).resolve()
-
     # Load the pre-cleaned data, if available
     if use_cleansed and (path.parent / "cleansed").is_dir():
         return load_cleansed_data(path=path.parent, return_value=return_value)
@@ -167,7 +167,7 @@ def prepare(
     meter_df = meter_curtail_df.copy()
 
     # Create datetime field
-    meter_df["time"] = pd.to_datetime(meter_df.time_utc).dt.tz_localize(None)
+    meter_df["time"] = pd.to_datetime(meter_df.timestamp).dt.tz_localize(None)
 
     # Drop the fields we don't need
     meter_df.drop(["timestamp", "availability_kWh", "curtailment_kWh"], axis=1, inplace=True)
@@ -179,7 +179,7 @@ def prepare(
     curtail_df = meter_curtail_df.copy()  # Make another copy for modifying the curtailment data
 
     # Create datetime field with a UTC base
-    curtail_df["time"] = pd.to_datetime(curtail_df.time_utc).dt.tz_localize(None)
+    curtail_df["time"] = pd.to_datetime(curtail_df.timestamp).dt.tz_localize(None)
 
     # Drop the fields we don't need
     curtail_df.drop(["timestamp"], axis=1, inplace=True)
@@ -190,55 +190,28 @@ def prepare(
     logger.info("Reading in the reanalysis data and calculating the extra fields")
 
     # MERRA2
-    reanalysis_merra2_df = pd.read_csv(path / "merra2_la_haute_borne.csv")
+    reanalysis_merra2_df = pd.read_csv(path / "merra2_seci1_new.csv")
 
     # Create datetime field with a UTC base
     reanalysis_merra2_df["datetime"] = pd.to_datetime(
-        reanalysis_merra2_df["datetime"], utc=True
+        reanalysis_merra2_df["timestamp"], utc=True
     ).dt.tz_localize(None)
 
     # calculate wind direction from u, v
     reanalysis_merra2_df["winddirection_deg"] = met.compute_wind_direction(
-        reanalysis_merra2_df["u_50"],
-        reanalysis_merra2_df["v_50"],
+        reanalysis_merra2_df["U50M"],
+        reanalysis_merra2_df["V50M"],
     )
 
     # Drop the fields we don't need
-    reanalysis_merra2_df.drop(["Unnamed: 0"], axis=1, inplace=True)
-
-    # ERA5
-    reanalysis_era5_df = pd.read_csv(path / "era5_wind_la_haute_borne.csv")
-
-    # remove a duplicated datetime column
-    reanalysis_era5_df = reanalysis_era5_df.loc[:, ~reanalysis_era5_df.columns.duplicated()].copy()
-
-    # Create datetime field with a UTC base
-    reanalysis_era5_df["datetime"] = pd.to_datetime(
-        reanalysis_era5_df["datetime"], utc=True
-    ).dt.tz_localize(None)
-
-    # Fill the 2 missing time stamps with NaN values
-    reanalysis_era5_df = reanalysis_era5_df.set_index(pd.DatetimeIndex(reanalysis_era5_df.datetime))
-    reanalysis_era5_df = reanalysis_era5_df.asfreq("1h")
-    reanalysis_era5_df["datetime"] = reanalysis_era5_df.index
-
-    # calculate wind direction from u, v
-    # NOTE: added .values to fix an issue where if the u and v arguments have ANY NaN values
-    # reanalysis_era5_df["winddirection_deg"] will be all NaN.
-    reanalysis_era5_df["winddirection_deg"] = met.compute_wind_direction(
-        reanalysis_era5_df["u_100"],
-        reanalysis_era5_df["v_100"],
-    ).values
-
-    # Drop the fields we don't need
-    reanalysis_era5_df.drop(["Unnamed: 0"], axis=1, inplace=True)
+    #reanalysis_merra2_df.drop(["Unnamed: 0"], axis=1, inplace=True)
 
     ##############
     # ASSET DATA #
     ##############
 
     logger.info("Reading in the asset data")
-    asset_df = pd.read_csv(path / "la-haute-borne_asset_table.csv")
+    asset_df = pd.read_csv(path / "Seci1_Asset_Table.csv")
 
     # Assign type to turbine for all assets
     asset_df["type"] = "turbine"
@@ -250,18 +223,18 @@ def prepare(
             meter_df,
             curtail_df,
             asset_df,
-            dict(era5=reanalysis_era5_df, merra2=reanalysis_merra2_df),
+            dict(merra2=reanalysis_merra2_df),
         )
     elif return_value == "plantdata":
         # Build and return PlantData
         engie_plantdata = PlantData(
             analysis_type="MonteCarloAEP",  # Choosing a random type that doesn't fail validation
-            metadata=path.parent / "plant_meta.yml",
+            metadata=path.parent.parent / "SECI1_plant_meta.yml",
             scada=scada_df,
             meter=meter_df,
             curtail=curtail_df,
             asset=asset_df,
-            reanalysis={"era5": reanalysis_era5_df, "merra2": reanalysis_merra2_df},
+            reanalysis={"merra2": reanalysis_merra2_df},
         )
         return engie_plantdata
     else:
@@ -270,3 +243,5 @@ def prepare(
 
 if __name__ == "__main__":
     prepare()
+
+# %%
