@@ -18,21 +18,13 @@ meter:
   MMTR_SupWh: net_energy_kWh  # net energy, kWh
   time: time  # timestamp
 reanalysis:
-  era5:  # reanalysis product name/ID
-    frequency: h  # timestamp frequency
-    WMETR_EnvPres: surf_pres  # surface pressure, Pa
-    WMETR_EnvTmp: t_2m  # temperature, K
-    time: datetime  # timestamps
-    WMETR_HorWdSpdU: u_100  # u-direction windspeed, m/s
-    WMETR_HorWdSpdV: v_100  # v-direction windspeed, m/s
-    WMETR_HorWdDir: winddirection_deg  # wind direction, degrees
   merra2:  # reanalysis product name/ID
     frequency: h  # timestamp frequency
     WMETR_EnvPres: surface_pressure  # surface pressure, Pa
     WMETR_EnvTmp: temp_2m  # temperature, K
     time: datetime  # timestamps
     WMETR_HorWdSpdU: u_50  # u-direction windspeed, m/s
-    WMETR_HorWdSpdV: v_50  # v-direction windspeed, m/s
+    V: v_50  # v-direction windspeed, m/s
     WMETR_HorWdDir: winddirection_deg  # wind direction, degrees
 scada:
   frequency: 10min  # timestamp frequency

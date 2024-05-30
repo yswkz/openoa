@@ -22,21 +22,12 @@
       "time": "time"
     },
     "reanalysis": {
-      "era5": {
-        "WMETR_EnvPres": "surf_pres",
-        "WMETR_EnvTmp": "t_2m",
-        "WMETR_HorWdDir": "winddirection_deg",
-        "WMETR_HorWdSpdU": "u_100",
-        "WMETR_HorWdSpdV": "v_100",
-        "frequency": "h",
-        "time": "datetime"
-      },
       "merra2": {
         "WMETR_EnvPres": "surface_pressure",
         "WMETR_EnvTmp": "temp_2m",
         "WMETR_HorWdDir": "winddirection_deg",
-        "WMETR_HorWdSpdU": "u_50",
-        "WMETR_HorWdSpdV": "v_50",
+        "WMETR_HorWdSpdU": "U50M",
+        "WMETR_HorWdSpdV": "V50M",
         "frequency": "h",
         "time": "datetime"
       }
